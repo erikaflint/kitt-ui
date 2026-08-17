@@ -47,6 +47,17 @@
         <p class="updated">Last updated <time id="updatedAt">never</time></p>
       </section>
 
+      <section class="panel packets-panel" aria-labelledby="packetsHeading">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Operations packets</p>
+            <h2 id="packetsHeading">Packets</h2>
+          </div>
+          <span class="count" id="packetCount">0</span>
+        </div>
+        <div id="packetsList" class="packets-list" aria-live="polite"></div>
+      </section>
+
       <section class="layout">
         <section class="panel jobs-panel" aria-labelledby="jobsHeading">
           <div class="panel-head">

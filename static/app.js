@@ -1,5 +1,6 @@
 const state = {
   jobs: [],
+  packets: [],
   selectedId: null,
   refreshTimer: null,
   backoffMs: 60000,
@@ -22,6 +23,8 @@ const els = {
   jobCount: document.querySelector("#jobCount"),
   jobsList: document.querySelector("#jobsList"),
   jobDetail: document.querySelector("#jobDetail"),
+  packetCount: document.querySelector("#packetCount"),
+  packetsList: document.querySelector("#packetsList"),
   message: document.querySelector("#message"),
   jobForm: document.querySelector("#jobForm"),
   createResult: document.querySelector("#createResult"),
@@ -95,6 +98,62 @@ function labelForStatus(status) {
     .filter(Boolean)
     .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
     .join(" ");
+}
+
+function renderPacketMetric(metric) {
+  return `
+    <div class="packet-metric">
+      <span>${escapeHtml(metric.label)}</span>
+      <strong>${escapeHtml(metric.value)}</strong>
+    </div>
+  `;
+}
+
+function renderPacketAction(action) {
+  if (action.url) {
+    return `<a class="packet-action" href="${escapeHtml(action.url)}" target="_blank" rel="noreferrer">${escapeHtml(action.label)}</a>`;
+  }
+  return `<span class="packet-action muted-action">${escapeHtml(action.label)}</span>`;
+}
+
+function renderPackets() {
+  els.packetCount.textContent = state.packets.length;
+  if (!state.packets.length) {
+    els.packetsList.innerHTML = `<div class="detail-empty">No packets yet. Future workers can drop JSON packets into packets/active.</div>`;
+    return;
+  }
+
+  els.packetsList.innerHTML = state.packets.map((packet) => {
+    const summary = packet.summary || {};
+    const cards = Array.isArray(packet.cards) ? packet.cards : [];
+    const metrics = cards.filter((card) => card.type === "metric").slice(0, 4);
+    const availability = cards.find((card) => card.type === "availability");
+    const actions = Array.isArray(packet.actions) ? packet.actions.slice(0, 3) : [];
+    return `
+      <article class="packet-card">
+        <div class="job-topline">
+          <span class="ref">${escapeHtml(packet.packet_type || packet.packet_id)}</span>
+          ${chip(packet.status || packet._mode)}
+          ${chip(packet.source || "source unset")}
+        </div>
+        <h3>${escapeHtml(packet.title || "Untitled packet")}</h3>
+        <p class="job-next">${escapeHtml(summary.next_best_action || packet.description || "No summary recorded.")}</p>
+        ${metrics.length ? `<div class="packet-metrics">${metrics.map(renderPacketMetric).join("")}</div>` : ""}
+        ${availability?.items?.length ? `
+          <div class="packet-block">
+            <h4>${escapeHtml(availability.label || "Availability")}</h4>
+            <div class="packet-actions">${availability.items.slice(0, 4).map(renderPacketAction).join("")}</div>
+          </div>
+        ` : ""}
+        ${actions.length ? `
+          <div class="packet-block">
+            <h4>Suggested actions</h4>
+            <div class="packet-actions">${actions.map(renderPacketAction).join("")}</div>
+          </div>
+        ` : ""}
+      </article>
+    `;
+  }).join("");
 }
 
 function updateStatusFilterOptions() {
@@ -198,11 +257,18 @@ async function loadJobs() {
   els.updatedAt.textContent = new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit", second: "2-digit" });
 }
 
+async function loadPackets() {
+  const data = await requestJson("/api/packets");
+  state.packets = data.packets || [];
+  renderPackets();
+}
+
 async function refreshAll() {
   if (state.typing) return;
   clearMessage();
   try {
     await loadHealth();
+    await loadPackets();
     await loadJobs();
     state.backoffMs = 60000;
   } catch (error) {

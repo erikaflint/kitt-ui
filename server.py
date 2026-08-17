@@ -23,6 +23,7 @@ from urllib.parse import parse_qs, urlparse
 ROOT = Path(__file__).resolve().parent
 APP_ROOT = ROOT
 STATIC_ROOT = APP_ROOT / "static"
+PACKETS_ROOT = APP_ROOT / "packets"
 LOG_DIR = ROOT / "outputs" / "kitt-ui"
 LOG_FILE = LOG_DIR / "kitt-ui.log"
 DEFAULT_ENV_FILE = Path(
@@ -135,6 +136,28 @@ def public_job(job: dict[str, Any]) -> dict[str, Any]:
     return safe
 
 
+def load_packets() -> list[dict[str, Any]]:
+    packets: list[dict[str, Any]] = []
+    for mode in ("active", "samples"):
+        folder = PACKETS_ROOT / mode
+        if not folder.exists():
+            continue
+        for path in sorted(folder.glob("*.json")):
+            try:
+                packet = json.loads(path.read_text(encoding="utf-8"))
+            except json.JSONDecodeError as error:
+                logging.warning("skipping malformed packet %s: %s", path, error)
+                continue
+            if not isinstance(packet, dict):
+                logging.warning("skipping non-object packet %s", path)
+                continue
+            packet.setdefault("packet_id", path.stem)
+            packet["_source_file"] = str(path.relative_to(APP_ROOT))
+            packet["_mode"] = "sample" if mode == "samples" else "active"
+            packets.append(packet)
+    return packets
+
+
 class KittUIHandler(BaseHTTPRequestHandler):
     server_version = "KITTUI/1.0"
 
@@ -179,6 +202,8 @@ class KittUIHandler(BaseHTTPRequestHandler):
             if path == "/api/health":
                 data = self.runtime.health()
                 return self._send_json({"ok": True, "data": data, "error": None})
+            if path == "/api/packets":
+                return self._send_json({"ok": True, "data": {"packets": load_packets()}, "error": None})
             if path == "/api/jobs":
                 query = parse_qs(parsed.query)
                 data = self.runtime.list_jobs(

@@ -1,0 +1,57 @@
+{
+  "packet_type": "calendar_intelligence",
+  "packet_id": "calendar-intelligence-sample",
+  "source": "acuity",
+  "campaign": "fill_my_calendar",
+  "title": "Erika Calendar Snapshot",
+  "status": "sample",
+  "generated_at": "2026-08-17T09:00:00-07:00",
+  "summary": {
+    "new_consultations": 2,
+    "open_consult_slots": 5,
+    "next_best_action": "Send the next two easy booking options to Meta consultation leads."
+  },
+  "cards": [
+    {
+      "type": "metric",
+      "label": "New consults",
+      "value": 2
+    },
+    {
+      "type": "metric",
+      "label": "Open consult spots",
+      "value": 5
+    },
+    {
+      "type": "metric",
+      "label": "This week booked",
+      "value": 4
+    },
+    {
+      "type": "availability",
+      "label": "Next easy openings",
+      "items": [
+        {
+          "label": "Tuesday 11:00 AM",
+          "url": "https://cascadehypnosiscenter.com/schedule/day/?weekday=3"
+        },
+        {
+          "label": "Wednesday 2:00 PM",
+          "url": "https://cascadehypnosiscenter.com/schedule/day/?weekday=4"
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "label": "Draft email to Meta leads",
+      "action_type": "suggest_job",
+      "role": "email_writer"
+    },
+    {
+      "label": "Review Fill My Calendar campaign",
+      "action_type": "open_campaign",
+      "campaign": "fill_my_calendar"
+    }
+  ]
+}

@@ -37,6 +37,7 @@ Browser JavaScript talks only to this local server:
 /api/health
 /api/jobs
 /api/jobs/:id
+/api/packets
 ```
 
 The local server talks to the KITT Runtime API with server-side credentials.
@@ -80,3 +81,21 @@ Temporary experiments for this app go in:
 ```
 
 Promote it or lose it. Sandbox is not memory and not production.
+
+## Packets
+
+KITT UI can render structured worker packets from:
+
+```text
+/Users/erikaflint/code/kitt-ui/packets/active/
+/Users/erikaflint/code/kitt-ui/packets/samples/
+```
+
+The first packet contract is calendar intelligence:
+
+```text
+/Users/erikaflint/code/kitt-ui/docs/packets.md
+```
+
+Workers should put live operator packets in `packets/active/`. Sample contracts
+belong in `packets/samples/`.

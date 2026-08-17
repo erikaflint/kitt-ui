@@ -50,6 +50,17 @@ class KittUIV1Tests(unittest.TestCase):
         self.assertFalse(payload["payload"]["implementation_allowed"])
         json.dumps(payload)
 
+    def test_load_packets_includes_calendar_intelligence_sample(self):
+        packets = server.load_packets()
+        calendar_packets = [
+            packet for packet in packets if packet.get("packet_type") == "calendar_intelligence"
+        ]
+        self.assertTrue(calendar_packets)
+        packet = calendar_packets[0]
+        self.assertEqual(packet["source"], "acuity")
+        self.assertEqual(packet["campaign"], "fill_my_calendar")
+        self.assertEqual(packet["_mode"], "sample")
+
 
 if __name__ == "__main__":
     unittest.main()
