@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>KITT UI V1</title>
+    <link rel="stylesheet" href="/static/app.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">KITT UI V1</p>
+          <h1>Calm work board</h1>
+          <p class="lede">One shared runtime view for jobs, status, and one safe way to add queued work.</p>
+        </div>
+        <div class="health-card" id="healthCard">
+          <span class="status-dot muted"></span>
+          <div>
+            <p class="label">Runtime</p>
+            <strong id="healthText">Checking...</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="toolbar" aria-label="Job controls">
+        <label class="search">
+          <span>Search jobs</span>
+          <input id="searchInput" type="search" placeholder="title, service, owner, ref">
+        </label>
+        <label>
+          <span>Status</span>
+          <select id="statusFilter">
+            <option value="">All</option>
+            <option value="queued">Queued</option>
+            <option value="claimed">Claimed</option>
+            <option value="audit_required">Audit Required</option>
+            <option value="needs_erika">Needs Erika</option>
+            <option value="needs_worker">Needs Worker</option>
+            <option value="running">Running</option>
+            <option value="drafted">Drafted</option>
+            <option value="audit_passed">Audit Passed</option>
+            <option value="done">Done</option>
+          </select>
+        </label>
+        <button id="refreshBtn" type="button">Refresh</button>
+        <p class="updated">Last updated <time id="updatedAt">never</time></p>
+      </section>
+
+      <section class="layout">
+        <section class="panel jobs-panel" aria-labelledby="jobsHeading">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Runtime jobs</p>
+              <h2 id="jobsHeading">Jobs</h2>
+            </div>
+            <span class="count" id="jobCount">0</span>
+          </div>
+          <div id="message" class="message hidden"></div>
+          <div id="jobsList" class="jobs-list" aria-live="polite"></div>
+        </section>
+
+        <aside class="panel detail-panel" aria-labelledby="detailHeading">
+          <div class="panel-head">
+            <div>
+              <p class="eyebrow">Selected</p>
+              <h2 id="detailHeading">Job detail</h2>
+            </div>
+          </div>
+          <div id="jobDetail" class="detail-empty">
+            Select a job to see its contract, next action, and recent events.
+          </div>
+        </aside>
+      </section>
+
+      <section class="panel add-panel" aria-labelledby="addHeading">
+        <div class="panel-head">
+          <div>
+            <p class="eyebrow">Safe intake</p>
+            <h2 id="addHeading">Add a queued job</h2>
+          </div>
+          <span class="safe-pill">implementation off by default</span>
+        </div>
+        <form id="jobForm" class="job-form">
+          <label>
+            <span>Title</span>
+            <input name="title" required maxlength="180" placeholder="Short, specific job title">
+          </label>
+          <label>
+            <span>Service or lane</span>
+            <input name="service" required maxlength="80" placeholder="kitt-ui, marketing, website">
+          </label>
+          <label>
+            <span>Owner or role</span>
+            <input name="owner" maxlength="120" placeholder="role:marketing-vp or claude-bellingham-voice">
+          </label>
+          <label>
+            <span>Campaign id</span>
+            <input name="campaign_id" maxlength="120" placeholder="optional">
+          </label>
+          <label>
+            <span>Priority</span>
+            <select name="priority">
+              <option value="normal">Normal</option>
+              <option value="high">High</option>
+              <option value="urgent">Urgent</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
+          <label>
+            <span>Risk</span>
+            <select name="risk_level">
+              <option value="yellow">Yellow - audit required</option>
+              <option value="green">Green - internal</option>
+              <option value="red">Red - approval required</option>
+            </select>
+          </label>
+          <label class="wide">
+            <span>Instructions</span>
+            <textarea name="instructions" rows="4" placeholder="What should be done, and what should be left alone?"></textarea>
+          </label>
+          <label class="wide">
+            <span>Definition of done</span>
+            <textarea name="definition_of_done" rows="3" placeholder="How will we know this job is complete?"></textarea>
+          </label>
+          <label class="wide">
+            <span>Next action</span>
+            <input name="next_action" maxlength="500" placeholder="First safe next step">
+          </label>
+          <div class="form-actions">
+            <button type="submit">Create queued job</button>
+            <p id="createResult" class="create-result"></p>
+          </div>
+        </form>
+      </section>
+    </main>
+    <script src="/static/app.js"></script>
+  </body>
+</html>
